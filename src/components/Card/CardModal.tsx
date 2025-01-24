@@ -27,9 +27,10 @@ interface Props {
   card?: Card
   onClose: () => void
   onSave: (card: Omit<Card, "id">) => void
+  onAddSubTask: (content: string) => void
 }
 
-const CardModal: React.FC<Props> = ({ card, onClose, onSave }) => {
+const CardModal: React.FC<Props> = ({ card, onClose, onSave, onAddSubTask }) => {
   const [formData, setFormData] = useState<Omit<Card, "id">>(
     card || {
       title: "",
@@ -38,6 +39,7 @@ const CardModal: React.FC<Props> = ({ card, onClose, onSave }) => {
       assignee: "",
       labels: [],
       columnId: "",
+      status: "할 일"
     },
   )
 
@@ -51,7 +53,7 @@ const CardModal: React.FC<Props> = ({ card, onClose, onSave }) => {
     <ModalBackground onClick={onClose}>
       <ModalContent onClick={(e) => e.stopPropagation()}>
         <h2>{card ? "Edit Card" : "Create New Card"}</h2>
-        <CardForm formData={formData} setFormData={setFormData} onSubmit={handleSubmit} />
+        <CardForm formData={formData} setFormData={setFormData} onSubmit={handleSubmit} onAddSubTask={onAddSubTask} />
       </ModalContent>
     </ModalBackground>
   )

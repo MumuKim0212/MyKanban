@@ -1,3 +1,5 @@
+import { TaskStatus } from ".";
+
 export interface Label {
     id: string;
     name: string;
@@ -11,6 +13,7 @@ export interface Label {
     assignee: string;
     labels: Label[];
     columnId: string;
+    status: TaskStatus;
   }
   
   export interface Column {
