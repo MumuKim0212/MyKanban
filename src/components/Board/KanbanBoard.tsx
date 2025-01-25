@@ -4,11 +4,13 @@ import { useQuery, useMutation, useQueryClient } from "react-query"
 import { DragDropContext, type DropResult } from "react-beautiful-dnd"
 import styled from "styled-components"
 import { fetchBoard, updateBoard } from "../../services/api/board"
-import type { Board } from "../../types/kanban"
+import { addCardToColumn } from "../../services/api/card"
+import type { Board, Card } from "../../types/kanban"
 import KanbanColumn from "./KanbanColumn"
 import ThemeSelector from "../ThemeSelector"
 import { useTheme } from "../../contexts/ThemeContext"
 import { type Project, Task, SubTask, type TaskStatus } from "../../types"
+import CardModal from "../Card/CardModal"
 
 const BoardContainer = styled.div<{ theme: string }>`
   display: flex;
@@ -66,6 +68,8 @@ const initialProjects: Project[] = [
 
 const KanbanBoard: React.FC = () => {
   const [projects, setProjects] = useState<Project[]>(initialProjects)
+  const [isAddCardModalOpen, setIsAddCardModalOpen] = useState(false)
+  const [selectedColumnId, setSelectedColumnId] = useState<string | null>(null)
   const queryClient = useQueryClient()
   const { data: board, isLoading, error } = useQuery<Board>("board", fetchBoard)
   const { theme } = useTheme()
@@ -116,6 +120,24 @@ const KanbanBoard: React.FC = () => {
     )
   }
 
+  const handleAddCard = (columnId: string) => {
+    setSelectedColumnId(columnId)
+    setIsAddCardModalOpen(true)
+  }
+
+  const handleSaveNewCard = async (newCard: Omit<Card, "id">) => {
+    if (selectedColumnId) {
+      try {
+        const addedCard = await addCardToColumn(selectedColumnId, newCard)
+        queryClient.invalidateQueries(["cards", selectedColumnId])
+        setIsAddCardModalOpen(false)
+      } catch (error) {
+        console.error("Error adding new card:", error)
+        // 여기에 사용자에게 오류 메시지를 표시하는 로직을 추가할 수 있습니다.
+      }
+    }
+  }
+
   const onDragEnd = (result: DropResult) => {
     const { destination, source, draggableId } = result
 
@@ -154,8 +176,12 @@ const KanbanBoard: React.FC = () => {
             projects={projects}
             updateTaskStatus={updateTaskStatus}
             addSubTask={addSubTask}
+            onAddCard={() => handleAddCard(column.id)}
           />
         ))}
+        {isAddCardModalOpen && (
+          <CardModal onClose={() => setIsAddCardModalOpen(false)} onSave={handleSaveNewCard} onAddSubTask={() => {}} />
+        )}
       </DragDropContext>
     </BoardContainer>
   )

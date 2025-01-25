@@ -27,6 +27,17 @@ const ColumnContainer = styled.div<{ theme: string }>`
   flex-direction: column;
 `
 
+const AddCardButton = styled.button`
+  margin-top: 8px;
+  padding: 8px;
+  background-color: #e0e0e0;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+  width: 100%;
+  text-align: center;
+`
+
 const Title = styled.h3<{ theme: string }>`
   padding: 8px;
   color: ${({ theme }) => (theme === "dark" ? "#fff" : "#000")};
@@ -45,9 +56,10 @@ interface Props {
   projects: Project[]
   updateTaskStatus: (projectId: string, taskId: string, newStatus: TaskStatus) => void
   addSubTask: (projectId: string, taskId: string, subTaskContent: string) => void
+  onAddCard: () => void
 }
 
-const KanbanColumn: React.FC<Props> = ({ column, projects, updateTaskStatus, addSubTask }) => {
+const KanbanColumn: React.FC<Props> = ({ column, projects, updateTaskStatus, addSubTask, onAddCard }) => {
   const { theme } = useTheme()
   const { data: cards, isLoading, error } = useQuery(["cards", column.id], () => fetchCards(column.id))
 
@@ -80,6 +92,7 @@ const KanbanColumn: React.FC<Props> = ({ column, projects, updateTaskStatus, add
           </CardList>
         )}
       </Droppable>
+      <AddCardButton onClick={onAddCard}>Add Card</AddCardButton>
     </ColumnContainer>
   )
 }
