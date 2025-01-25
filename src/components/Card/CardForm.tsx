@@ -2,6 +2,7 @@ import type React from "react"
 import styled from "styled-components"
 import type { Card } from "../../types/kanban"
 import { useState } from "react"
+import LabelInput from "./LabelInput"
 
 const Form = styled.form`
   display: flex;
@@ -46,20 +47,6 @@ const CardForm: React.FC<Props> = ({ formData, setFormData, onSubmit, onAddSubTa
     setFormData((prev) => ({ ...prev, [name]: value }))
   }
 
-  interface Label {
-    id: string;
-    name: string;
-  }
-
-  const handleLabelsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const labelNames = e.target.value.split(",").map((label) => label.trim())
-    const labels: Label[] = labelNames.map((name) => ({
-      id: crypto.randomUUID(),
-      name
-    }))
-    setFormData((prev) => ({ ...prev, labels }))
-  }
-
   const handleAddSubTask = (e: React.FormEvent) => {
     e.preventDefault()
     if (newSubTask.trim()) {
@@ -84,11 +71,9 @@ const CardForm: React.FC<Props> = ({ formData, setFormData, onSubmit, onAddSubTa
         <option value="high">High</option>
       </Select>
       <Input name="assignee" value={formData.assignee} onChange={handleChange} placeholder="Assignee" />
-      <Input
-        name="labels"
-        value={formData.labels.join(", ")}
-        onChange={handleLabelsChange}
-        placeholder="Labels (comma-separated)"
+      <LabelInput
+        labels={formData.labels}
+        onChange={(newLabels) => setFormData((prev) => ({ ...prev, labels: newLabels }))}
       />
       <Input value={newSubTask} onChange={(e) => setNewSubTask(e.target.value)} placeholder="New subtask" />
       <Button type="button" onClick={handleAddSubTask}>
