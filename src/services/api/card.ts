@@ -22,3 +22,7 @@ export const deleteCard = async (cardId: string): Promise<void> => {
   await axios.delete(`${API_URL}/api/cards/${cardId}`)
 }
 
+export const addCardToColumn = async (columnId: string, card: Omit<Card, "id">): Promise<Card> => {
+  const response = await axios.post(`${API_URL}/api/columns/${columnId}/cards`, card)
+  return response.data
+}
