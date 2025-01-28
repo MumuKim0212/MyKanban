@@ -9,12 +9,22 @@ jobs:
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
     steps:
-      - uses: dawidd6/action-download-artifact@v2
+      - name: Download Server Build
+        uses: dawidd6/action-download-artifact@v2
         with:
           workflow: ci.yml
           workflow_conclusion: success
-          name: build
-
+          name: server-build
+          path: server-dist
+          
+      - name: Download Client Build
+        uses: dawidd6/action-download-artifact@v2
+        with:
+          workflow: ci.yml
+          workflow_conclusion: success
+          name: client-build
+          path: client-build
+          
       - name: Add SSH key
         run: |
           mkdir -p ~/.ssh
@@ -24,7 +34,19 @@ jobs:
           
       - name: Deploy
         run: |
-          ssh ${{ secrets.USERNAME }}@${{ secrets.HOST }} "rm -rf /home/${{ secrets.USERNAME }}/build/*"
-          scp -r ./* ${{ secrets.USERNAME }}@${{ secrets.HOST }}:/home/${{ secrets.USERNAME }}/build/
-          ssh ${{ secrets.USERNAME }}@${{ secrets.HOST }} "chmod -R 755 /home/${{ secrets.USERNAME }}/build"
+          # 서버 배포
+          ssh ${{ secrets.USERNAME }}@${{ secrets.HOST }} "mkdir -p ~/app/server"
+          ssh ${{ secrets.USERNAME }}@${{ secrets.HOST }} "rm -rf ~/app/server/*"
+          scp -r server-dist/* ${{ secrets.USERNAME }}@${{ secrets.HOST }}:~/app/server/
+          
+          # 클라이언트 배포
+          ssh ${{ secrets.USERNAME }}@${{ secrets.HOST }} "mkdir -p ~/app/client"
+          ssh ${{ secrets.USERNAME }}@${{ secrets.HOST }} "rm -rf ~/app/client/*"
+          scp -r client-build/* ${{ secrets.USERNAME }}@${{ secrets.HOST }}:~/app/client/
+          
+          # 권한 설정
+          ssh ${{ secrets.USERNAME }}@${{ secrets.HOST }} "chmod -R 755 ~/app"
+          
+          # 서버 재시작
+          ssh ${{ secrets.USERNAME }}@${{ secrets.HOST }} "pm2 restart all || pm2 start ~/app/server/app.js"
           ssh ${{ secrets.USERNAME }}@${{ secrets.HOST }} "sudo systemctl restart nginx"

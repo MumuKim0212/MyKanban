@@ -1,15 +1,24 @@
 name: CI
 on: [push, pull_request]
 jobs:
- build:
-   runs-on: ubuntu-latest
-   steps:
-     - uses: actions/checkout@v4
-     - uses: actions/setup-node@v4
-     - run: npm install
-     - run: CI=false npm run build
-     - uses: actions/upload-artifact@v4
-       with:
-         name: build
-         path: build/
-         retention-days: 1
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+      - name: Install Dependencies and Build
+        run: |
+          npm install
+          CI=false npm run build
+      - name: Upload Server Build
+        uses: actions/upload-artifact@v4
+        with:
+          name: server-build
+          path: Server/dist/
+          retention-days: 1
+      - name: Upload Client Build
+        uses: actions/upload-artifact@v4
+        with:
+          name: client-build
+          path: Client/build/
+          retention-days: 1

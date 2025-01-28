@@ -1,28 +1,29 @@
 import axios from "axios"
 import type { Card } from "../../types/kanban"
 
-const API_URL = process.env.REACT_APP_API_URL || "http://158.179.195.203"
+//const API_URL = process.env.REACT_APP_API_URL || "http://158.179.195.203"
 
 export const fetchCards = async (columnId: string): Promise<Card[]> => {
-  const response = await axios.get(`${API_URL}/api/columns/${columnId}/cards`)
+  const response = await axios.get(`/api/columns/${columnId}/cards`)
   return response.data
 }
 
 export const createCard = async (columnId: string, card: Omit<Card, "id">): Promise<Card> => {
-  const response = await axios.post(`${API_URL}/api/columns/${columnId}/cards`, card)
+  const response = await axios.post(`/api/columns/${columnId}/cards`, card)
   return response.data
 }
 
 export const updateCard = async (card: Card): Promise<Card> => {
-  const response = await axios.put(`${API_URL}/api/cards/${card.id}`, card)
+  const response = await axios.put(`/api/cards/${card.id}`, card)
   return response.data
 }
 
 export const deleteCard = async (cardId: string): Promise<void> => {
-  await axios.delete(`${API_URL}/api/cards/${cardId}`)
+  await axios.delete(`/api/cards/${cardId}`)
 }
 
 export const addCardToColumn = async (columnId: string, card: Omit<Card, "id">): Promise<Card> => {
-  const response = await axios.post(`${API_URL}/api/columns/${columnId}/cards`, card)
+  const response = await axios.post(`/api/columns/${columnId}/cards`, card)
   return response.data
 }
+
