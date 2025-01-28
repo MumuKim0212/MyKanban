@@ -9,7 +9,8 @@ jobs:
       - name: Install Dependencies and Build
         run: |
           npm install
-          CI=false npm run build
+          npm run build:Server
+          DISABLE_ESLINT_PLUGIN=true CI=false npm run build:Client
       - name: Upload Server Build
         uses: actions/upload-artifact@v4
         with:

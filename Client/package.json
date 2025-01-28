@@ -6,6 +6,7 @@
     "@prisma/client": "^6.2.1",
     "@tanstack/react-query": "^5.64.2",
     "@tanstack/react-query-devtools": "^5.64.2",
+    "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
     "axios": "^1.7.9",
     "cors": "^2.8.5",
     "cra-template": "1.2.0",
