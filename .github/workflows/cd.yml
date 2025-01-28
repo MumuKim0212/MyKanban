@@ -41,10 +41,10 @@ jobs:
           ssh ${{ secrets.USERNAME }}@${{ secrets.HOST }} "rm -rf ~/app/server/*"
           
           # 서버 파일 복사
-          scp -r server-dist/* Server/package.json ${{ secrets.USERNAME }}@${{ secrets.HOST }}:~/app/server/
+          scp -r server-dist/* Server/package.json Server/prisma ${{ secrets.USERNAME }}@${{ secrets.HOST }}:~/app/server/
           
-          # 서버 의존성 설치
-          ssh ${{ secrets.USERNAME }}@${{ secrets.HOST }} "cd ~/app/server && npm install --production"
+          # 서버 의존성 설치 및 Prisma 설정
+          ssh ${{ secrets.USERNAME }}@${{ secrets.HOST }} "cd ~/app/server && npm install && npx prisma generate"
           
           # 클라이언트 배포
           ssh ${{ secrets.USERNAME }}@${{ secrets.HOST }} "mkdir -p ~/app/client"
