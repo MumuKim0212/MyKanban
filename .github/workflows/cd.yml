@@ -9,6 +9,8 @@ jobs:
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4
+      
       - name: Download Server Build
         uses: dawidd6/action-download-artifact@v2
         with:
@@ -34,10 +36,15 @@ jobs:
           
       - name: Deploy
         run: |
-          # 서버 배포
+          # 서버 디렉토리 준비
           ssh ${{ secrets.USERNAME }}@${{ secrets.HOST }} "mkdir -p ~/app/server"
           ssh ${{ secrets.USERNAME }}@${{ secrets.HOST }} "rm -rf ~/app/server/*"
-          scp -r server-dist/* ${{ secrets.USERNAME }}@${{ secrets.HOST }}:~/app/server/
+          
+          # 서버 파일 복사
+          scp -r server-dist/* Server/package.json ${{ secrets.USERNAME }}@${{ secrets.HOST }}:~/app/server/
+          
+          # 서버 의존성 설치
+          ssh ${{ secrets.USERNAME }}@${{ secrets.HOST }} "cd ~/app/server && npm install --production"
           
           # 클라이언트 배포
           ssh ${{ secrets.USERNAME }}@${{ secrets.HOST }} "mkdir -p ~/app/client"
