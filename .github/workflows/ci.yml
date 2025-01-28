@@ -8,15 +8,28 @@ jobs:
       - uses: actions/setup-node@v4
       - name: Install Dependencies and Build
         run: |
+          # 최상위 의존성 설치
           npm install
-          npm run build:Server
-          CI=false npm run build:Client 
+          
+          # Server 빌드 (TypeScript -> JavaScript)
+          cd Server 
+          npm install
+          npm run build
+          cd ..
+          
+          # Client 빌드
+          cd Client
+          npm install
+          CI=false npm run build
+          cd ..
+
       - name: Upload Server Build
         uses: actions/upload-artifact@v4
         with:
           name: server-build
           path: Server/dist/
           retention-days: 1
+          
       - name: Upload Client Build
         uses: actions/upload-artifact@v4
         with:
