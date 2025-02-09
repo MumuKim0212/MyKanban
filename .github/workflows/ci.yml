@@ -13,6 +13,7 @@ jobs:
           
           # Server 빌드 (TypeScript -> JavaScript)
           cd Server 
+          echo "secrets.SERVER_ENV" >> .env
           npm install
           npm run build
           cd ..
